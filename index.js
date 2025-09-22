@@ -13,7 +13,6 @@ app.use(cors());
 app.use(express.json());
 
 // Middleware de segurança para habilitar SharedArrayBuffer (necessário para ffmpeg.wasm)
-// ESSENCIAL para a conversão no frontend funcionar.
 app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
@@ -21,33 +20,22 @@ app.use((req, res, next) => {
 });
 
 // ----------------------------------------------------
-// 1. ROTAS PARA SERVIR ARQUIVOS ESTÁTICOS (Otimizado)
+// 1. ROTAS PARA SERVIR ARQUIVOS ESTÁTICOS
 // ----------------------------------------------------
 
-// Middleware para servir arquivos estáticos: 
-// Ele serve 'style.css', 'frontend.js', e o 'index.html' por padrão na rota '/'.
 app.use(express.static(path.join(__dirname)));
 
-// Se você mantiver o app.use(express.static(__dirname)), 
-// as rotas individuais abaixo se tornam redundantes:
-
-/* // app.get('/style.css', ...)
-// app.get('/frontend.js', ...)
-*/
-
-// Opcional: Rota raiz que garante que o index.html será servido, 
-// embora express.static já faça isso. Manteremos para clareza.
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 
 // ----------------------------------------------------
-// 2. ROTA DA API DE TRANSCRIÇÃO (Simulada)
+// 2. ROTA DA API DE TRANSCRIÇÃO (Pronta para API Real)
 // ----------------------------------------------------
 
-// Rota para Transcrição
-app.post('/transcribe', upload.single('file'), (req, res) => {
+// Rota para Transcrição - AGORA É ASYNC
+app.post('/transcribe', upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Nenhum arquivo enviado para transcrição.' });
     }
@@ -55,20 +43,36 @@ app.post('/transcribe', upload.single('file'), (req, res) => {
     const inputPath = req.file.path; 
     console.log(`[Transcription] Arquivo recebido em ${inputPath}`);
 
-    // Simulação de tempo de processamento (5 segundos)
-    setTimeout(() => {
-        const simulatedTranscript = "Olá! A transcrição foi concluída com sucesso. Seu conversor está pronto! Não se esqueça de clicar no botão 'Copiar Chave' para doar se este recurso foi útil. Obrigado pelo apoio, Laura. ";
+    try {
+        // ------------------------------------------------------------------
+        // === PASSO CHAVE: INTEGRE SUA LÓGICA DE API AQUI ===
+        // 
+        // 1. O arquivo de áudio temporário está em: inputPath
+        // 2. Transfira o arquivo para sua API (Whisper, Google, etc.).
+        // 3. Obtenha o resultado da transcrição.
+        // 
+        // SUBSTITUA a linha abaixo pela sua chamada de API real.
+        // Ex: const transcribedText = await callTranscriptionService(inputPath);
+        
+        const transcribedText = "SUBSTITUA-ME! Insira a transcrição real aqui.";
+        
+        // ------------------------------------------------------------------
 
-        // Limpa o arquivo temporário
+
+        // Retorna a transcrição
+        res.json({ text: transcribedText });
+
+    } catch (error) {
+        console.error('Erro no processamento da transcrição:', error);
+        res.status(500).json({ error: 'Erro no servidor ao tentar transcrever o áudio.' });
+        
+    } finally {
+        // Limpa o arquivo temporário (SEMPRE deve ser feito)
         fs.unlink(inputPath, (err) => {
             if (err) console.error(`Erro ao limpar arquivo ${inputPath}:`, err);
             else console.log(`[Cleanup] Arquivo temporário ${inputPath} removido.`);
-        }); 
-
-        // Retorna a transcrição
-        res.json({ text: simulatedTranscript });
-
-    }, 5000); 
+        });
+    }
 });
 
 // ----------------------------------------------------

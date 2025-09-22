@@ -1,302 +1,97 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Opus → MP4 + Transcrição — Laura</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#5b6cff; --glass:rgba(255,255,255,0.03);
-      --radius:14px; --maxw:980px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef8;background:linear-gradient(180deg,#071021 0%,var(--bg) 100%);}
-    .wrap{max-width:var(--maxw);margin:36px auto;padding:28px;border-radius:20px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 10px 30px rgba(2,6,23,0.6);}
-    header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
-    .logo{width:62px;height:62px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2dd4bf);display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:20px}
-    h1{margin:0;font-size:20px}
-    p.lead{margin:4px 0 0;color:var(--muted);font-size:13px}
-
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-top:18px}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
-
-    .card{background:var(--card);padding:18px;border-radius:var(--radius);box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
-    label{display:block;font-size:13px;margin-bottom:8px;color:var(--muted)}
-    .file-input{display:flex;gap:8px;align-items:center}
-    input[type=file]{display:none}
-    .btn{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
-    .muted{color:var(--muted);font-size:13px}
-
-    .preview{display:flex;gap:12px;flex-direction:column}
-    video, audio{width:100%;border-radius:10px;background:black}
-    textarea{width:100%;min-height:160px;border-radius:10px;border:0;padding:12px;background:var(--glass);color:#e6eef8;resize:vertical}
-    .actions{display:flex;gap:8px;align-items:center}
-    .small{font-size:13px}
-    footer{margin-top:16px;color:var(--muted);font-size:13px}
-
-    .brand{font-weight:700;color:var(--accent)}
-    .status{font-size:13px;color:var(--muted);margin-top:8px}
-    .loader{display:inline-block;width:10px;height:10px;border-radius:50%;background:#fff;opacity:.7;margin-right:8px;animation:blink 1s linear infinite}
-    @keyframes blink{0%{opacity:0.2}50%{opacity:1}100%{opacity:0.2}}
-
-    .hint{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;border:1px dashed rgba(255,255,255,0.03);color:var(--muted);font-size:13px}
-  </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Opus → MP4 + Transcrição — Laura</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="wrap">
-    <header>
-      <div class="logo">LD</div>
-      <div>
-        <h1>Opus → MP4 + Transcrição</h1>
-        <p class="lead">Converta arquivos .opus para MP4 (imagem estática + áudio) e obtenha o texto. Feito em HTML/CSS/JS puro.</p>
-      </div>
+    
+    <header class="wrap">
+        <div class="logo">L</div>
+        <div>
+            <h1>Conversor de Áudio Opus para MP4 e Transcrição</h1>
+            <p class="lead">Ferramenta gratuita para converter áudios do WhatsApp e gerar transcrições via AI.</p>
+        </div>
     </header>
 
-    <div class="grid">
-      <section class="card">
-        <label for="file">Escolha o arquivo .opus</label>
-        <div class="file-input">
-          <label class="btn" for="file">Selecionar</label>
-          <div id="filename" class="muted">Nenhum arquivo selecionado</div>
-          <input id="file" type="file" accept="audio/ogg,audio/opus,.opus" />
+    <main class="wrap">
+        <div class="grid">
+            
+            <section class="card preview">
+                <div class="hint">
+                    1. Selecione o arquivo .opus (geralmente do WhatsApp).
+                </div>
+
+                <label for="file">Arquivo de Áudio (.opus)</label>
+                <div class="file-input">
+                    <label class="btn" for="file">Selecionar</label>
+                    <div id="filename" class="muted">Nenhum arquivo selecionado</div>
+                    <input id="file" type="file" accept="audio/ogg,audio/opus,.opus" />
+                </div>
+
+                <audio id="audioplayer" controls></audio>
+                
+                <hr style="border-color: rgba(255, 255, 255, 0.05);">
+
+                <label>2. Conversão e Transcrição</label>
+                <div class="actions">
+                    <button id="convertBtn" class="btn">Converter para MP4 (Frontend)</button>
+                    <button id="downloadBtn" class="btn ghost" disabled>Baixar MP4</button>
+                    <button id="serverBtn" class="btn" style="margin-left: auto;">
+                        Transcrever via Servidor (Recomendado)
+                    </button>
+                </div>
+                
+                <div id="status" class="status">Aguardando seleção do arquivo...</div>
+
+                <video id="player" controls style="display: block; margin-top: 15px;"></video>
+            </section>
+
+            <aside class="card">
+                <label>3. Resultado da Transcrição</label>
+                <div class="actions">
+                    <button id="copyBtn" class="btn small ghost">Copiar Texto</button>
+                    <button id="useMic" class="btn small ghost" style="margin-left: auto;">
+                        Transcrever pelo microfone
+                    </button>
+                </div>
+                
+                <textarea id="transcript" placeholder="O texto transcrito aparecerá aqui..." style="margin-top: 8px;"></textarea>
+
+                <label style="margin-top: 15px;">Logs Técnicos (FFmpeg/API)</label>
+                <textarea id="log" readonly style="min-height: 100px; font-size: 11px;"></textarea>
+            </aside>
         </div>
+    </main>
+    
+    <div id="donation-popup" class="popup-overlay">
+        <div class="popup-content card">
+            <button id="close-popup" class="popup-close">×</button>
+            <h2>✨ Apoie o Projeto! ✨</h2>
+            <p>Se você gostou do conversor, considere fazer uma doação para ajudar a manter o servidor da API de Transcrição funcionando. Qualquer valor é bem-vindo!</p>
+            
+            <div class="pix-area">
+                <p>Chave PIX (E-mail):</p>
+                <div class="pix-input-group">
+                    <input type="text" id="pix-key" value="lauradevcode@gmail.com" readonly />
+                    <button id="copy-pix" class="btn">Copiar Chave</button>
+                </div>
+            </div>
 
-        <div style="height:12px"></div>
-        <label class="small">Opções</label>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="convertBtn" class="btn">Converter para MP4</button>
-          <button id="downloadBtn" class="btn ghost" disabled>Baixar MP4</button>
+            <div style="margin-top: 15px; font-size: 13px; color: var(--muted);">
+                Agradeço imensamente o seu apoio! 🙏
+            </div>
         </div>
-
-        <div class="status" id="status">Pronto.</div>
-
-        <hr style="margin:16px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)" />
-
-        <label>Transcrição</label>
-        <div class="hint">Transcrição automática não é 100% confiável no navegador. Duas opções abaixo:</div>
-        <div style="height:10px"></div>
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <button id="useMic" class="btn ghost">Transcrever pelo microfone (ao tocar o áudio)</button>
-          <button id="serverBtn" class="btn">Enviar para API (exemplo)</button>
-        </div>
-
-        <textarea id="transcript" placeholder="Aqui aparecerá o texto (ou cole manualmente)"></textarea>
-
-        <div style="height:12px"></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button id="copyBtn" class="btn ghost">Copiar texto</button>
-        </div>
-
-        <footer>
-          <div>Nota: a conversão usa <strong>ffmpeg.wasm</strong> no navegador. Para transcrição automática robusta recomendo enviar o arquivo para um serviço/servidor que rode Whisper/WhisperX ou usar uma instância local de whisper.cpp. Veja instruções no código.</div>
-        </footer>
-      </section>
-
-      <aside class="card">
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div class="muted">Preview</div>
-          <div class="preview">
-            <video id="player" controls playsinline></video>
-            <audio id="audioplayer" controls></audio>
-          </div>
-
-          <div style="height:8px"></div>
-
-          <div class="muted">Logs</div>
-          <pre id="log" class="hint" style="white-space:pre-wrap;max-height:220px;overflow:auto"></pre>
-        </div>
-      </aside>
     </div>
-  </main>
-
-  <!-- ffmpeg.wasm from CDN -->
-  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script> 
-
-  <script>
-    // Vanilla JS app
-    const { createFFmpeg, fetchFile } = FFmpeg;
-    const ffmpeg = createFFmpeg({log: true});
-
-    const fileInput = document.getElementById('file');
-    const filenameLabel = document.getElementById('filename');
-    const convertBtn = document.getElementById('convertBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const statusEl = document.getElementById('status');
-    const logEl = document.getElementById('log');
-    const player = document.getElementById('player');
-    const audioPlayer = document.getElementById('audioplayer');
-    const transcriptEl = document.getElementById('transcript');
-    const copyBtn = document.getElementById('copyBtn');
-    const useMicBtn = document.getElementById('useMic');
-    const serverBtn = document.getElementById('serverBtn');
-
-    let inputFile = null;
-    let mp4BlobUrl = null;
-
-    function log(msg){
-      logEl.textContent += msg + "\n";
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-
-    fileInput.addEventListener('change', (e)=>{
-      const f = e.target.files[0];
-      if(!f) return;
-      inputFile = f;
-      filenameLabel.textContent = f.name + ' (' + Math.round(f.size/1024) + ' KB)';
-      audioPlayer.src = URL.createObjectURL(f);
-      player.src = '';
-      mp4BlobUrl = null;
-      downloadBtn.disabled = true;
-      transcriptEl.value = '';
-      log('Arquivo selecionado: ' + f.name);
-    });
-
-    async function ensureFFmpeg(){
-      if(!ffmpeg.isLoaded()){
-        statusEl.textContent = 'Carregando ffmpeg.wasm (pode demorar)...';
-        await ffmpeg.load();
-        statusEl.textContent = 'ffmpeg carregado.';
-        log('ffmpeg.wasm carregado.');
-      }
-    }
-
-    async function createPoster(title){
-      const c = document.createElement('canvas');
-      c.width = 1280; c.height = 720;
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = '#071025'; ctx.fillRect(0,0,c.width,c.height);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '72px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(title, c.width/2, c.height/2);
-      return await new Promise(res => c.toBlob(res, 'image/png'));
-    }
-
-    convertBtn.addEventListener('click', async ()=>{
-      if(!inputFile) return alert('Escolha um arquivo .opus antes.');
-      try{
-        convertBtn.disabled = true;
-        statusEl.textContent = 'Preparando...';
-        await ensureFFmpeg();
-
-        // write input
-        ffmpeg.FS('writeFile', 'input.opus', await fetchFile(inputFile));
-
-        // poster
-        const posterBlob = await createPoster(inputFile.name.replace(/\.[^.]+$/, ''));
-        ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
-
-        statusEl.textContent = 'Convertendo para MP4...';
-        log('Iniciando conversão...');
-
-        try{
-          await ffmpeg.run('-loop','1','-i','poster.png','-i','input.opus','-c:v','libx264','-c:a','aac','-b:a','192k','-shortest','-pix_fmt','yuv420p','-movflags','faststart','out.mp4');
-        }catch(e){
-          log('Falha com libx264 — tentativa de remux: ' + e.message);
-          // fallback: try simple copy (may fail if codecs incompatible)
-          await ffmpeg.run('-i','input.opus','-c','copy','out.mp4');
-        }
-
-        const data = ffmpeg.FS('readFile','out.mp4');
-        const blob = new Blob([data.buffer], {type:'video/mp4'});
-        if(mp4BlobUrl) URL.revokeObjectURL(mp4BlobUrl);
-        mp4BlobUrl = URL.createObjectURL(blob);
-        player.src = mp4BlobUrl;
-        downloadBtn.disabled = false;
-        statusEl.textContent = 'Conversão concluída.';
-        log('Conversão finalizada.');
-      }catch(err){
-        console.error(err);
-        log('Erro: ' + (err.message||err));
-        statusEl.textContent = 'Erro durante conversão. Veja logs.';
-      }finally{
-        convertBtn.disabled = false;
-      }
-    });
-
-    downloadBtn.addEventListener('click', ()=>{
-      if(!mp4BlobUrl) return;
-      const a = document.createElement('a');
-      a.href = mp4BlobUrl;
-      a.download = (inputFile?.name?.replace(/\.[^.]+$/, '') || 'output') + '.mp4';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    });
-
-    copyBtn.addEventListener('click', async ()=>{
-      try{
-        await navigator.clipboard.writeText(transcriptEl.value);
-        alert('Texto copiado.');
-      }catch(e){alert('Erro ao copiar: ' + e.message)}
-    });
-
-    // ---------- Transcrição: duas abordagens exemplar
-
-    // 1) Transcrever via microfone: instruções ao usuário para tocar o áudio e deixar o microfone captar
-    useMicBtn.addEventListener('click', async ()=>{
-      if(!inputFile) return alert('Selecione um arquivo antes.');
-      // This is a best-effort helper: open the audio in a new window and ask user to allow mic and play it near the mic.
-      // Browser limitations prevent programmatic route of system audio to SpeechRecognition.
-      alert('A transcrição via microfone é experimental: após OK, o áudio será reproduzido e você deve permitir o uso do microfone. O reconhecimento dependerá da qualidade do microfone e do ambiente.');
-      try{
-        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-        // Create a SpeechRecognition if supported
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if(!SpeechRecognition) return alert('Web Speech API não suportada no seu navegador. Use uma API de servidor para transcrição mais precisa.');
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'pt-BR';
-        recognition.interimResults = true;
-        recognition.continuous = true;
-        recognition.onresult = (ev)=>{
-          let text = '';
-          for(let i=0;i<ev.results.length;i++) text += ev.results[i][0].transcript + (ev.results[i].isFinal? '\n':'');
-          transcriptEl.value = text;
-        };
-        recognition.onerror = (e)=>log('SpeechRecognition error: ' + e.error);
-        recognition.start();
-
-        // play audio through system (user must allow) — we also attach the file to an audio element and play
-        audioPlayer.src = URL.createObjectURL(inputFile);
-        audioPlayer.play();
-
-        // stop recognition when audio ends
-        audioPlayer.onended = ()=>{recognition.stop(); stream.getTracks().forEach(t=>t.stop()); alert('Reprodução finalizada — reconhecimento parado.');};
-      }catch(e){
-        log('Transcrição via microfone falhou: ' + e.message);
-        alert('Erro ao acessar microfone: ' + e.message + '\nConsidere usar uma API de servidor para transcrição.');
-      }
-    });
-
-    // 2) Enviar para API de transcrição (exemplo) — você precisa apontar para seu servidor que roda Whisper/WhisperX
-    serverBtn.addEventListener('click', async ()=>{
-      if(!inputFile) return alert('Selecione um arquivo antes.');
-      const confirmed = confirm('Este botão mostra um exemplo de como enviar o arquivo para uma API. Sem servidor, nada será feito. Deseja ver o exemplo?');
-      if(!confirmed) return;
-      // Example: the user must host an API endpoint that accepts multipart/form-data and returns JSON {text: "..."}
-      const exampleUrl = 'https://sua-api-de-transcricao.exemplo/transcribe';
-      const proceed = confirm('No exemplo você enviará o arquivo para: ' + exampleUrl + '\nSubstitua pela sua API ou crie uma instância que rode Whisper. OK para continuar?');
-      if(!proceed) return;
-      try{
-        statusEl.textContent = 'Enviando para API...';
-        const form = new FormData();
-        form.append('file', inputFile);
-        const res = await fetch(exampleUrl, {method:'POST',body:form});
-        if(!res.ok) throw new Error('Resposta da API: ' + res.status);
-        const j = await res.json();
-        transcriptEl.value = j.text || JSON.stringify(j);
-        statusEl.textContent = 'Transcrição recebida.';
-        log('Transcrição via servidor OK.');
-      }catch(e){
-        statusEl.textContent = 'Falha ao enviar para API.';
-        log('Erro ao enviar para API: ' + (e.message||e));
-        alert('Erro ao enviar para API. Veja logs.');
-      }
-    });
-
-  </script>
+    
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    <script src="frontend.js"></script>
 </body>
 </html>

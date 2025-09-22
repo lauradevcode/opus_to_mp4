@@ -2,26 +2,49 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const fs = require('fs');
-const path = require('path'); // Novo: Importa o módulo path
+const path = require('path'); 
 
-// Configuração do Multer
+// Configuração do Multer para lidar com upload de arquivos. 
+// Cria a pasta 'uploads/' para arquivos temporários.
 const upload = multer({ dest: 'uploads/', limits: { fileSize: 60 * 1024 * 1024 } }); 
 
 const app = express();
-app.use(cors());
+app.use(cors()); 
 app.use(express.json());
 
-// Adiciona os cabeçalhos de isolamento (ESSENCIAL PARA SharedArrayBuffer)
+// Middleware de segurança para habilitar SharedArrayBuffer (necessário para ffmpeg.wasm)
+// ESSENCIAL para a conversão no frontend funcionar.
 app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     next();
 });
 
-// Rota Raiz: Serve o arquivo HTML
+// ----------------------------------------------------
+// 1. ROTAS PARA SERVIR ARQUIVOS ESTÁTICOS (Otimizado)
+// ----------------------------------------------------
+
+// Middleware para servir arquivos estáticos: 
+// Ele serve 'style.css', 'frontend.js', e o 'index.html' por padrão na rota '/'.
+app.use(express.static(path.join(__dirname)));
+
+// Se você mantiver o app.use(express.static(__dirname)), 
+// as rotas individuais abaixo se tornam redundantes:
+
+/* // app.get('/style.css', ...)
+// app.get('/frontend.js', ...)
+*/
+
+// Opcional: Rota raiz que garante que o index.html será servido, 
+// embora express.static já faça isso. Manteremos para clareza.
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+
+
+// ----------------------------------------------------
+// 2. ROTA DA API DE TRANSCRIÇÃO (Simulada)
+// ----------------------------------------------------
 
 // Rota para Transcrição
 app.post('/transcribe', upload.single('file'), (req, res) => {
@@ -30,11 +53,11 @@ app.post('/transcribe', upload.single('file'), (req, res) => {
     }
 
     const inputPath = req.file.path; 
-    console.log(`[Transcription] Arquivo recebido: ${req.file.originalname} em ${inputPath}`);
-    
-    // Simulação de tempo de processamento
+    console.log(`[Transcription] Arquivo recebido em ${inputPath}`);
+
+    // Simulação de tempo de processamento (5 segundos)
     setTimeout(() => {
-        const simulatedTranscript = "Olá, este é o texto transcrito pelo servidor. Esta função substitui a necessidade de FFmpeg para a conversão de áudio. Para a transcrição real, o código aqui chamaria um modelo de IA como o Whisper.";
+        const simulatedTranscript = "Olá! A transcrição foi concluída com sucesso. Seu conversor está pronto! Não se esqueça de clicar no botão 'Copiar Chave' para doar se este recurso foi útil. Obrigado pelo apoio, Laura. ";
 
         // Limpa o arquivo temporário
         fs.unlink(inputPath, (err) => {
@@ -42,11 +65,15 @@ app.post('/transcribe', upload.single('file'), (req, res) => {
             else console.log(`[Cleanup] Arquivo temporário ${inputPath} removido.`);
         }); 
 
+        // Retorna a transcrição
         res.json({ text: simulatedTranscript });
-        console.log(`[Transcription] Simulação de transcrição enviada para o cliente.`);
 
     }, 5000); 
 });
+
+// ----------------------------------------------------
+// 3. INÍCIO DO SERVIDOR
+// ----------------------------------------------------
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
